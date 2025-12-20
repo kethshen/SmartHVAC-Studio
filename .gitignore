@@ -1,0 +1,10 @@
+# Firebase / secrets
+serviceAccountKey.json
+*.json
+
+# Colab temporary files
+*.png
+*.csv
+
+# Python cache
+__pycache__/
