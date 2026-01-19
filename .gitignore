@@ -8,3 +8,7 @@ serviceAccountKey.json
 
 # Python cache
 __pycache__/
+
+# secret 
+.env
+*.env
