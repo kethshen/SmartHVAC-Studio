@@ -9,6 +9,16 @@ serviceAccountKey.json
 # Python cache
 __pycache__/
 
-# secret 
+# Environment files
 .env
 *.env
+
+# Secrets / configs
+firebaseConfig.js
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Node / tooling (future-proof)
+node_modules/
