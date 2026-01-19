@@ -54,8 +54,7 @@ FYP/
 
 ## Author
 
-**Kethaka**
-Final Year Mechanical Engineering Undergraduate 
+**Kethaka Shehan** - Final Year Mechanical Engineering Undergraduate 
 
-Supervisor: **Dr. D.H.S. Maithripala (Mugalan)**
+Supervisor: **Dr. D.H.S. Maithripala (@mugalan)** 
 
