@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NLP Input – SmartHVAC Studio</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h2>Natural Language HVAC Description</h2>
+
+<p>
+Describe your building and HVAC system in natural language.
+</p>
+
+<textarea id="description"
+  rows="6" cols="80"
+  placeholder="Example: A 3-zone office building in Colombo with a VAV HVAC system">
+</textarea>
+
+<br><br>
+
+<button onclick="submitDescription()">Submit Description</button>
+
+<p id="statusMsg"></p>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- Shared JS -->
+<script src="../script.js"></script>
+
+</body>
+</html>
