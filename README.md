@@ -41,21 +41,9 @@ FYP/
 
 ---
 
-## Project Roadmap (High Level)
-
-1. Single-zone EnergyPlus simulation ✔️
-2. EKF-based parameter estimation (in progress)
-3. Web-based model configuration (single zone)
-4. Extension to multi-zone buildings
-5. Experimental validation using lab test rig
-6. Advanced estimation methods (ML / RL – later)
-
----
-
 ## Author
 
-**Kethaka**
-Final Year Mechanical Engineering Undergraduate 
+**Kethaka Shehan** - Final Year Mechanical Engineering Undergraduate 
 
-Supervisor: **Dr. D.H.S. Maithripala (Mugalan)**
+Supervisor: **Dr. D.H.S. Maithripala (@mugalan)** 
 
