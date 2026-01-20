@@ -1,70 +1,81 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>System Architecture – SmartHVAC Studio</title>
   <link rel="stylesheet" href="../style.css">
 </head>
+
 <body>
 
-<h2>System Architecture</h2>
+  <nav>
+    <a href="../index.html">Home</a> |
+    <a href="nlp.html">NLP Input</a> |
+    <a href="config.html">Config</a> |
+    <a href="results.html">Results</a>
+  </nav>
+  <hr>
 
-<p>
-SmartHVAC Studio is an academic platform that integrates a web interface,
-cloud coordination, and offline HVAC simulation to support AI-assisted
-modeling and analysis of HVAC systems.
-</p>
+  <h2>System Architecture</h2>
 
-<hr>
+  <p>
+    SmartHVAC Studio is an academic platform that integrates a web interface,
+    cloud coordination, and offline HVAC simulation to support AI-assisted
+    modeling and analysis of HVAC systems.
+  </p>
 
-<h3>High-Level Architecture</h3>
+  <hr>
 
-<ul>
-  <li><b>Web Interface (SmartHVAC Studio)</b><br>
+  <h3>High-Level Architecture</h3>
+
+  <ul>
+    <li><b>Web Interface (SmartHVAC Studio)</b><br>
       Used for experiment configuration, natural language input,
       and visualization of results.</li>
 
-  <li><b>Cloud Coordination (Firebase)</b><br>
+    <li><b>Cloud Coordination (Firebase)</b><br>
       Stores experiment metadata and manages file-based simulation outputs.</li>
 
-  <li><b>Simulation & Estimation Backend (Google Colab)</b><br>
+    <li><b>Simulation & Estimation Backend (Google Colab)</b><br>
       Executes EnergyPlus simulations and EKF-based parameter estimation.</li>
 
-  <li><b>Experimental Validation</b><br>
+    <li><b>Experimental Validation</b><br>
       Uses a single-zone HVAC laboratory setup for real-world validation.</li>
-</ul>
+  </ul>
 
-<hr>
+  <hr>
 
-<h3>Data Flow Overview</h3>
+  <h3>Data Flow Overview</h3>
 
-<p>
-The web interface submits experiment requests, which are processed offline
-by the simulation backend. Results are uploaded to cloud storage and
-visualized through the web platform.
-</p>
+  <p>
+    The web interface submits experiment requests, which are processed offline
+    by the simulation backend. Results are uploaded to cloud storage and
+    visualized through the web platform.
+  </p>
 
-<pre>
+  <pre>
 User → Web Interface → Firebase → Colab (Simulation & EKF)
      ← Results & Plots ← Firebase Storage
 </pre>
 
-<hr>
+  <hr>
 
-<h3>Design Principles</h3>
+  <h3>Design Principles</h3>
 
-<ul>
-  <li>Clear separation between interface and computation</li>
-  <li>Physics-based simulation with AI-assisted configuration</li>
-  <li>Modular and extensible research platform</li>
-  <li>Suitable for academic demonstration and evaluation</li>
-</ul>
+  <ul>
+    <li>Clear separation between interface and computation</li>
+    <li>Physics-based simulation with AI-assisted configuration</li>
+    <li>Modular and extensible research platform</li>
+    <li>Suitable for academic demonstration and evaluation</li>
+  </ul>
 
-<hr>
+  <hr>
 
-<p style="font-size: 0.9em; color: #555;">
-This platform is developed as part of an academic Final Year Project and
-is intended for research and educational purposes only.
-</p>
+  <p style="font-size: 0.9em; color: #555;">
+    This platform is developed as part of an academic Final Year Project and
+    is intended for research and educational purposes only.
+  </p>
 
 </body>
+
 </html>
