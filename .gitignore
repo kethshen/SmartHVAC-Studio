@@ -15,6 +15,7 @@ __pycache__/
 
 # Secrets / configs
 firebaseConfig.js
+serviceAccountKey.json
 
 # OS junk
 .DS_Store
