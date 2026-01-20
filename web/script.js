@@ -55,11 +55,23 @@ function submitDescription() {
     errorMessage: null
   };
 
-  db.collection("jobs").add(jobData)
-    .then((docRef) => {
+  // Generate Custom ID: "job_YYYYMMDD_HHMMSS"
+  const now = new Date();
+  const timestampId = now.getFullYear() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0') + "_" +
+    String(now.getHours()).padStart(2, '0') +
+    String(now.getMinutes()).padStart(2, '0') +
+    String(now.getSeconds()).padStart(2, '0');
+
+  const customJobId = `job_${timestampId}`;
+
+  // Use set() with custom ID instead of add()
+  db.collection("jobs").doc(customJobId).set(jobData)
+    .then(() => {
       const statusMsg = document.getElementById("statusMsg");
       if (statusMsg) {
-        statusMsg.innerText = `Job submitted! ID: ${docRef.id} (Waiting for Colab)`;
+        statusMsg.innerText = `Job submitted! ID: ${customJobId} (Waiting for Colab)`;
         statusMsg.style.color = "green";
       }
       input.value = ""; // Clear input
