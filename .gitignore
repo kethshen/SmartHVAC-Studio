@@ -22,3 +22,6 @@ Thumbs.db
 
 # Node / tooling (future-proof)
 node_modules/
+
+# from obsidian notes
+Obsidian/
