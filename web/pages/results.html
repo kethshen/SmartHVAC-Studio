@@ -1,92 +1,97 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Runs – SmartHVAC Studio</title>
+  <title>Jobs – SmartHVAC Studio</title>
   <link rel="stylesheet" href="../style.css">
 </head>
+
 <body>
 
-<h2>Experiment Runs</h2>
+  <h2>Job Dashboard</h2>
 
-<p>
-Below is the list of submitted HVAC simulation runs.
-</p>
+  <p>
+    Below is the list of submitted simulation jobs.
+  </p>
 
-<button onclick="loadRuns()">Refresh Runs</button>
-<p id="autoMsg"></p>
+  <button onclick="loadRuns()">Refresh Jobs</button>
+  <p id="autoMsg"></p>
 
-<br><br>
+  <br><br>
 
-<table border="1" cellpadding="8">
-  <thead>
-    <tr>
-      <th>Description</th>
-      <th>Status</th>
-      <th>Created At</th>
-    </tr>
-  </thead>
-  <tbody id="runsTable">
-    <!-- Runs will appear here -->
-  </tbody>
-</table>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody id="runsTable">
+      <!-- Jobs will appear here -->
+    </tbody>
+  </table>
 
-<hr>
+  <hr>
 
-<!-- See details of a selected run -->
-<h3>Selected Run Details</h3>
+  <!-- See details of a selected job -->
+  <h3>Selected Job Details</h3>
 
-<div id="runDetails">
-  <p><b>Description:</b> <span id="detailDescription">-</span></p>
-  <p><b>Status:</b> <span id="detailStatus">-</span></p>
-  <p><b>Created At:</b> <span id="detailTime">-</span></p>
-  <p><b>Results Folder:</b> <span id="detailPath">-</span></p>
-</div>
+  <div id="runDetails">
+    <p><b>Description:</b> <span id="detailDescription">-</span></p>
+    <p><b>Status:</b> <span id="detailStatus">-</span></p>
+    <p><b>Created At:</b> <span id="detailTime">-</span></p>
+    <p><b>Output Path:</b> <span id="detailPath">-</span></p>
+  </div>
 
-<!-- Run Status Guide -->
-<hr>
+  <!-- Job Status Guide -->
+  <hr>
 
-<h3>Run Status Guide</h3>
+  <h3>Job Status Guide (5-Layer Arch)</h3>
 
-<ul>
-  <li><b>Pending</b> – The experiment request has been submitted and is waiting to be processed.</li>
-  <li><b>Running</b> – The simulation and estimation are currently in progress.</li>
-  <li><b>Completed</b> – The experiment has finished and results are available for viewing.</li>
-  <li><b>Failed</b> – The experiment could not be completed due to an error.</li>
-</ul>
+  <ul>
+    <li><b>Queued</b> – Job is waiting in Firestore for Colab to pick it up.</li>
+    <li><b>Running</b> – Colab is processing (Generating IDF, Simulating EKF).</li>
+    <li><b>Done</b> – Results have been uploaded to Storage and are ready to view.</li>
+    <li><b>Error</b> – Something failed in the backend.</li>
+  </ul>
 
-<!-- Prepare the Results panel structure -->
-<hr>
+  <!-- Prepare the Results panel structure -->
+  <hr>
 
-<h3>Simulation Results</h3>
+  <div id="resultsContainer">
+    <h3>Simulation Results</h3>
 
-<div class="results-section">
-  <h4>Zone State Plots</h4>
-  <img id="zonePlot" width="600">
-  <p id="zonePlotMsg"></p>
-</div>
+    <div class="results-section">
+      <h4>Zone State Plots</h4>
+      <img id="zonePlot" width="600" alt="Select a completed job to see plot">
+      <p id="zonePlotMsg"></p>
+    </div>
 
-<div class="results-section">
-  <h4>EKF Estimation Results</h4>
-  <div class="placeholder">EKF convergence and estimation plots will appear here.</div>
-</div>
+    <div class="results-section">
+      <h4>EKF Estimation Results</h4>
+      <div class="placeholder">EKF convergence plots will appear here.</div>
+    </div>
 
-<div class="results-section">
-  <h4>Weather Data</h4>
-  <div class="placeholder">Outdoor weather plots will appear here.</div>
-</div>
+    <div class="results-section">
+      <h4>Weather Data</h4>
+      <div class="placeholder">Outdoor weather plots will appear here.</div>
+    </div>
 
-<div class="results-section">
-  <h4>Energy & System Outputs</h4>
-  <div class="placeholder">Energy consumption and system output plots will appear here.</div>
-</div>
+    <div class="results-section">
+      <h4>Energy & System Outputs</h4>
+      <div class="placeholder">Energy consumption plots will appear here.</div>
+    </div>
+  </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-<!-- Shared JS -->
-<script src="../script.js"></script>
+  <!-- Shared JS -->
+  <script type="module" src="../script.js"></script>
 
 </body>
+
 </html>

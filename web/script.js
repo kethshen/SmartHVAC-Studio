@@ -1,5 +1,5 @@
-// SmartHVAC Studio — Safe Firebase Client
-// No secrets stored in this file
+// SmartHVAC Studio — Commercial-Grade Client
+// Follows 5-Layer Architecture -> Layer 1 (Frontend) & Layer 2 (Firebase Coordination)
 
 import { firebaseConfig } from "./firebaseConfig.js";
 
@@ -10,26 +10,27 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-console.log("Firebase initialized safely");
+console.log("Firebase initialized (5-Layer Architecture Mode)");
 
 // ----------------------------
 // TEST: Firestore write
 // ----------------------------
 function testFirestoreWrite() {
-  db.collection("test_runs").add({
+  db.collection("test_connectivity").add({
     message: "SmartHVAC Studio connected",
     timestamp: new Date()
   })
-  .then(() => {
-    alert("Firestore connection successful!");
-  })
-  .catch((error) => {
-    console.error("Firestore error:", error);
-  });
+    .then(() => {
+      alert("Firestore connection successful!");
+    })
+    .catch((error) => {
+      console.error("Firestore error:", error);
+      alert("Firestore error: " + error.message);
+    });
 }
 
 // ----------------------------
-// Create a new run from NLP input
+// Create a new Job (Layer 1 -> Layer 2)
 // ----------------------------
 function submitDescription() {
 
@@ -39,128 +40,151 @@ function submitDescription() {
     return;
   }
 
-  db.collection("runs").add({
-    description: input.value,
-    status: "pending",
-    created_at: new Date()
-  })
-  .then((docRef) => {
-    const resultsPath = `results/${docRef.id}/`;
+  // Exact Data Model from Architecture PDF
+  const jobData = {
+    status: "queued",
+    nlpInputText: input.value,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
 
-    return db.collection("runs").doc(docRef.id).update({
-      results_path: resultsPath
+    // Placeholders for Layer 3 (Colab) to fill
+    idfFilePath: null,
+    weatherFilePath: null,
+    simulationConfig: JSON.parse(localStorage.getItem("smartHVAC_config") || "{}"),
+    resultPath: null,
+    errorMessage: null
+  };
+
+  db.collection("jobs").add(jobData)
+    .then((docRef) => {
+      const statusMsg = document.getElementById("statusMsg");
+      if (statusMsg) {
+        statusMsg.innerText = `Job submitted! ID: ${docRef.id} (Waiting for Colab)`;
+        statusMsg.style.color = "green";
+      }
+      input.value = ""; // Clear input
+      // If we are on the results page or dashboard, refresh list
+      if (typeof loadJobs === "function") {
+        loadJobs();
+      }
+    })
+    .catch((error) => {
+      console.error("Job creation failed:", error);
+      const statusMsg = document.getElementById("statusMsg");
+      if (statusMsg) {
+        statusMsg.innerText = "Error submitting job: " + error.message;
+        statusMsg.style.color = "red";
+      }
     });
-  })
-  .then(() => {
-    document.getElementById("statusMsg").innerText =
-      "Run created successfully (pending).";
-  })
-  .catch((error) => {
-    console.error("Run creation failed:", error);
-  });
 }
 
 // ----------------------------
-// Load all runs
+// Load all Jobs (Status Polling)
 // ----------------------------
-function loadRuns() {
+function loadJobs() {
 
   const tableBody = document.getElementById("runsTable");
   if (!tableBody) return;
 
+  // Clear current list
   tableBody.innerHTML = "";
 
-  db.collection("runs")
-    .orderBy("created_at", "desc")
-    .get()
-    .then((snapshot) => {
+  db.collection("jobs")
+    .orderBy("createdAt", "desc")
+    .limit(10) // Keep UI clean
+    .onSnapshot((snapshot) => {
+      // Real-time listener (better than manual polling)
+      tableBody.innerHTML = ""; // Clear again for update
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-
         const row = document.createElement("tr");
-        row.onclick = () => showRunDetails(doc.id);
+
+        // Row styling based on status
+        let statusColor = "black";
+        if (data.status === "running") statusColor = "orange";
+        if (data.status === "done") statusColor = "green";
+        if (data.status === "error") statusColor = "red";
 
         row.innerHTML = `
-          <td>${data.description}</td>
-          <td>${data.status}</td>
-          <td>${data.created_at
-            ? data.created_at.toDate().toLocaleString()
-            : "-"}</td>
-        `;
+              <td>${data.nlpInputText ? data.nlpInputText.substring(0, 50) + "..." : "No description"}</td>
+              <td style="color: ${statusColor}; font-weight: bold;">${data.status}</td>
+              <td>${data.createdAt ? data.createdAt.toDate().toLocaleString() : "Just now"}</td>
+            `;
+
+        // Click to show details
+        row.onclick = () => showJobDetails(doc.id, data);
+        row.style.cursor = "pointer";
 
         tableBody.appendChild(row);
       });
-
-    })
-    .catch(err => console.error("Load runs failed:", err));
-}
-
-// ----------------------------
-// Auto refresh
-// ----------------------------
-function startAutoRefresh() {
-  loadRuns();
-  setInterval(loadRuns, 30000);
-}
-
-// ----------------------------
-// Show run details
-// ----------------------------
-function showRunDetails(runId) {
-
-  db.collection("runs").doc(runId).get()
-    .then((doc) => {
-      if (!doc.exists) return;
-
-      const data = doc.data();
-
-      document.getElementById("detailDescription").innerText = data.description;
-      document.getElementById("detailStatus").innerText = data.status;
-      document.getElementById("detailTime").innerText =
-        data.created_at
-          ? data.created_at.toDate().toLocaleString()
-          : "-";
-      document.getElementById("detailPath").innerText =
-        data.results_path || "-";
-    });
-
-  loadZonePlot(runId);
-}
-
-// ----------------------------
-// Load result plot
-// ----------------------------
-function loadZonePlot(runId) {
-
-  const img = document.getElementById("zonePlot");
-  const msg = document.getElementById("zonePlotMsg");
-
-  if (!img) return;
-
-  const path = `results/${runId}/zone_plot.png`;
-  msg.innerText = "Loading plot...";
-
-  storage.ref(path).getDownloadURL()
-    .then((url) => {
-      img.src = url;
-      msg.innerText = "";
-    })
-    .catch(() => {
-      img.src = "";
-      msg.innerText = "Plot not available yet.";
+    }, (error) => {
+      console.error("Error loading jobs:", error);
+      const autoMsg = document.getElementById("autoMsg");
+      if (autoMsg) autoMsg.innerText = "Error syncing jobs.";
     });
 }
 
 // ----------------------------
-// Page load
+// Show Job Details & Results
+// ----------------------------
+function showJobDetails(jobId, data) {
+  // Fill text details
+  const elDesc = document.getElementById("detailDescription");
+  const elStatus = document.getElementById("detailStatus");
+  const elTime = document.getElementById("detailTime");
+  const elPath = document.getElementById("detailPath"); // Re-purposed for ID/Path
+
+  if (elDesc) elDesc.innerText = data.nlpInputText;
+  if (elStatus) elStatus.innerText = data.status;
+  if (elTime) elTime.innerText = data.createdAt ? data.createdAt.toDate().toLocaleString() : "-";
+  if (elPath) elPath.innerText = data.resultPath || "Waiting...";
+
+  // Handle Results Visualization
+  const container = document.getElementById("resultsContainer"); // Make sure HTML has this
+  const imgInfo = document.getElementById("zonePlot");
+  const msgInfo = document.getElementById("zonePlotMsg");
+
+  if (!imgInfo) return;
+
+  if (data.status === "done") {
+    // Load real results from Storage
+    const plotPath = `results/${jobId}/zone_plot.png`;
+    msgInfo.innerText = "Loading plot from: " + plotPath;
+
+    storage.ref(plotPath).getDownloadURL()
+      .then((url) => {
+        imgInfo.src = url;
+        msgInfo.innerText = "";
+        imgInfo.style.display = "block";
+      })
+      .catch((e) => {
+        console.log("No plot found yet:", e);
+        imgInfo.style.display = "none";
+        msgInfo.innerText = "Plot pending or not generated.";
+      });
+  } else if (data.status === "error") {
+    imgInfo.style.display = "none";
+    msgInfo.innerText = "Job failed: " + (data.errorMessage || "Unknown error");
+    msgInfo.style.color = "red";
+  } else {
+    imgInfo.style.display = "none";
+    msgInfo.innerText = "Simulation in progress... (" + data.status + ")";
+    msgInfo.style.color = "gray";
+  }
+}
+
+// ----------------------------
+// Auto-Init on Page Load
 // ----------------------------
 window.addEventListener("load", () => {
+  // If we are on the results page, load jobs immediately
   if (document.getElementById("runsTable")) {
-    startAutoRefresh();
+    loadJobs();
   }
 });
 
-// Expose functions to HTML
+// Expose functions to global scope for HTML onclick
 window.testFirestoreWrite = testFirestoreWrite;
 window.submitDescription = submitDescription;
+window.loadRuns = loadJobs; // Alias for backward compatibility if HTML buttons haven't changed yet

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Configuration – SmartHVAC Studio</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+    <h2>Simulation Configuration</h2>
+
+    <p>
+        Configure global settings for your simulation jobs. These settings will be applied to new jobs when you queue
+        them.
+    </p>
+
+    <!-- Config Form -->
+    <div style="border: 1px solid #ccc; padding: 20px; max-width: 600px;">
+        <label for="weather"><strong>Weather Location:</strong></label><br>
+        <select id="weather">
+            <option value="Colombo, Sri Lanka">Colombo, Sri Lanka</option>
+            <option value="New York, USA">New York, USA</option>
+            <option value="London, UK">London, UK</option>
+        </select>
+        <br><br>
+
+        <label for="duration"><strong>Simulation Duration (Days):</strong></label><br>
+        <input type="number" id="duration" value="7" min="1" max="365">
+        <br><br>
+
+        <label><strong>Advanced Options:</strong></label><br>
+        <input type="checkbox" id="enableEKF" checked> <label for="enableEKF">Enable EKF Estimation</label><br>
+        <input type="checkbox" id="enableLogging"> <label for="enableLogging">Enable Verbose Logging</label>
+        <br><br>
+
+        <button onclick="saveConfig()">Save Configuration</button>
+        <span id="saveMsg" style="margin-left: 10px; color: green;"></span>
+    </div>
+
+    <br>
+    <a href="nlp.html">Go to Job Submission &rarr;</a>
+
+    <script>
+        // Simple Config Manager using LocalStorage (Layer 1 State)
+
+        function loadConfig() {
+            const saved = localStorage.getItem("smartHVAC_config");
+            if (saved) {
+                const config = JSON.parse(saved);
+                if (config.weather) document.getElementById("weather").value = config.weather;
+                if (config.duration) document.getElementById("duration").value = config.duration;
+                document.getElementById("enableEKF").checked = config.enableEKF;
+                document.getElementById("enableLogging").checked = config.enableLogging;
+            }
+        }
+
+        function saveConfig() {
+            const config = {
+                weather: document.getElementById("weather").value,
+                duration: document.getElementById("duration").value,
+                enableEKF: document.getElementById("enableEKF").checked,
+                enableLogging: document.getElementById("enableLogging").checked,
+                savedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem("smartHVAC_config", JSON.stringify(config));
+
+            const msg = document.getElementById("saveMsg");
+            msg.innerText = "Settings Saved!";
+            setTimeout(() => msg.innerText = "", 2000);
+        }
+
+        // Load defaults on run
+        loadConfig();
+    </script>
+
+</body>
+
+</html>
