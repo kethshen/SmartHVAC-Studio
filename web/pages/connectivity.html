@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Connectivity Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>System Diagnostic</h2>
+    <div id="logs">Initializing...<br></div>
+
+    <!-- Firebase SDKs (Compat version for simplicity) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Config Loader -->
+    <script type="module">
+        import { firebaseConfig } from "../firebaseConfig.js";
+
+        function log(msg, type = "") {
+            const el = document.getElementById("logs");
+            el.innerHTML += `<span class="${type}">${msg}</span><br>`;
+        }
+
+        try {
+            log("1. Loading Config...");
+            if (!firebaseConfig) throw new Error("Config object is missing!");
+            log("Config loaded Project: " + firebaseConfig.projectId, "pass");
+
+            log("2. Initializing App...");
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            log("App Initialized.", "pass");
+
+            log("3. Testing Firestore Write...");
+            const testId = "test_" + Date.now();
+            db.collection("connectivity_test").doc(testId).set({
+                status: "alive",
+                timestamp: new Date()
+            })
+                .then(() => {
+                    log(`Write Success! Document ID: ${testId}`, "pass");
+                    log("<b>SYSTEM READY.</b> If you see this, Firebase is working.", "pass");
+                })
+                .catch(e => {
+                    log("Write Failed: " + e.message, "fail");
+                    console.error(e);
+                });
+
+        } catch (e) {
+            log("CRITICAL ERROR: " + e.message, "fail");
+            console.error(e);
+        }
+    </script>
+</body>
+
+</html>
