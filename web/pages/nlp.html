@@ -27,6 +27,14 @@
 
   <br><br>
 
+  <label for="aiModel">Select AI Model:</label>
+  <select id="aiModel">
+    <option value="gemini">Google Gemini (Free Tier)</option>
+    <option value="openai">OpenAI (Requires Paid Key)</option>
+  </select>
+
+  <br><br>
+
   <button onclick="submitDescription()">Queue Simulation Job</button>
 
   <p id="statusMsg"></p>

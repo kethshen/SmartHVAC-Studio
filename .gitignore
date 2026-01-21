@@ -13,9 +13,9 @@ __pycache__/
 .env
 *.env
 
-# Secrets / configs
 firebaseConfig.js
 serviceAccountKey.json
+colab/secrets.json
 
 # OS junk
 .DS_Store
