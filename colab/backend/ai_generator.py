@@ -105,7 +105,7 @@ class AIPipelines:
         # Gemini (New SDK) uses models.generate_content
         full_prompt = f"{system}\n\n{user}"
         response = self.gemini_client.models.generate_content(
-            model='gemini-1.5-flash-001', 
+            model='gemini-2.5-flash-lite', 
             contents=full_prompt
         )
         return self._sanitize_output(response.text)
@@ -140,7 +140,7 @@ class AIPipelines:
         if self.gemini_client:
             try:
                 self.gemini_client.models.generate_content(
-                    model='gemini-1.5-flash-001', contents="hi"
+                    model='gemini-2.5-flash-lite', contents="hi"
                 )
                 results["gemini"] = True
             except Exception as e:
