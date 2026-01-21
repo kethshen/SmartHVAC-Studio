@@ -69,7 +69,14 @@ class FirebaseConnector:
         blob_path = f"{remote_folder}/{job_id}/{filename}"
         blob = self.bucket.blob(blob_path)
         
-        blob.upload_from_filename(local_path)
+        # Simple MIME type detection based on extension
+        content_type = "application/octet-stream"
+        if filename.endswith(".png"):
+            content_type = "image/png"
+        elif filename.endswith(".html"):
+            content_type = "text/html"
+        
+        blob.upload_from_filename(local_path, content_type=content_type)
         print(f"[Storage] Uploaded {filename} to {blob_path}")
         
         # Make it publicly accessible for simple viewing (optional, or use signed URLs)
@@ -80,6 +87,6 @@ class FirebaseConnector:
         """Uploads a string (like IDF content) as a file directly."""
         blob_path = f"{remote_folder}/{job_id}/{filename}"
         blob = self.bucket.blob(blob_path)
-        blob.upload_from_string(content)
+        blob.upload_from_string(content, content_type="text/plain")
         print(f"[Storage] Uploaded string content to {blob_path}")
         return blob_path
