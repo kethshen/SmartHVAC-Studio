@@ -105,7 +105,7 @@ class AIPipelines:
         # Gemini (New SDK) uses models.generate_content
         full_prompt = f"{system}\n\n{user}"
         response = self.gemini_client.models.generate_content(
-            model='gemini-1.5-flash-latest', 
+            model='gemini-1.5-flash-001', 
             contents=full_prompt
         )
         return self._sanitize_output(response.text)
@@ -121,3 +121,29 @@ class AIPipelines:
         if clean.endswith("```"):
             clean = clean[:-3]
         return clean.strip()
+
+    def test_connections(self):
+        """Tests connectivity to both APIs."""
+        results = {"openai": False, "gemini": False, "details": ""}
+        
+        # Test OpenAI
+        if self.openai_client:
+            try:
+                self.openai_client.chat.completions.create(
+                    model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hi"}], max_tokens=1
+                )
+                results["openai"] = True
+            except Exception as e:
+                results["details"] += f"OpenAI Fail: {str(e)}; "
+        
+        # Test Gemini
+        if self.gemini_client:
+            try:
+                self.gemini_client.models.generate_content(
+                    model='gemini-1.5-flash-001', contents="hi"
+                )
+                results["gemini"] = True
+            except Exception as e:
+                results["details"] += f"Gemini Fail: {str(e)}; "
+                
+        return results

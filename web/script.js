@@ -82,13 +82,69 @@ function submitDescription() {
       }
     })
     .catch((error) => {
-      console.error("Job creation failed:", error);
-      const statusMsg = document.getElementById("statusMsg");
       if (statusMsg) {
         statusMsg.innerText = "Error submitting job: " + error.message;
         statusMsg.style.color = "red";
       }
     });
+}
+
+// ----------------------------
+// Test AI Connectivity (Layer 4 Check)
+// ----------------------------
+function testAIConnection() {
+  const statusMsg = document.getElementById("statusMsg");
+  if (statusMsg) statusMsg.innerText = "Requesting connectivity test...";
+
+  // Create a special "test_connection" job
+  const jobData = {
+    status: "test_connection",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    nlpInputText: "Connectivity Check"
+  };
+
+  const now = new Date();
+  const timestampId = now.getFullYear() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0') + "_" +
+    String(now.getHours()).padStart(2, '0') +
+    String(now.getMinutes()).padStart(2, '0') +
+    String(now.getSeconds()).padStart(2, '0');
+
+  const customJobId = `test_ai_${timestampId}`;
+
+  db.collection("jobs").doc(customJobId).set(jobData)
+    .then(() => {
+      if (statusMsg) {
+        statusMsg.innerText = "Test requested. Waiting for Colab...";
+        statusMsg.style.color = "blue";
+      }
+
+      // Listen for the result of THIS specific test job
+      const unsubscribe = db.collection("jobs").doc(customJobId)
+        .onSnapshot((doc) => {
+          const data = doc.data();
+          if (data && data.status === "tested" && data.testResults) {
+            // Display Detailed Results
+            const results = data.testResults;
+            const resDiv = document.getElementById("connectionResults");
+
+            let html = "";
+            html += `OpenAI: <span style="color:${results.openai ? 'green' : 'red'}">${results.openai ? 'Supported' : 'Failed'}</span> &nbsp;|&nbsp; `;
+            html += `Gemini: <span style="color:${results.gemini ? 'green' : 'red'}">${results.gemini ? 'Supported' : 'Failed'}</span>`;
+
+            if (results.details) {
+              html += `<br><small style="color:gray; font-weight:normal;">${results.details}</small>`;
+            }
+
+            if (resDiv) resDiv.innerHTML = html;
+            if (statusMsg) statusMsg.innerText = "Connection Check Complete.";
+
+            unsubscribe(); // Stop listening
+          }
+        });
+    })
+    .catch((e) => alert("Failed: " + e.message));
 }
 
 // ----------------------------
@@ -200,4 +256,5 @@ window.addEventListener("load", () => {
 // Expose functions to global scope for HTML onclick
 window.testFirestoreWrite = testFirestoreWrite;
 window.submitDescription = submitDescription;
+window.testAIConnection = testAIConnection;
 window.loadRuns = loadJobs; // Alias for backward compatibility if HTML buttons haven't changed yet

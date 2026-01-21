@@ -32,7 +32,9 @@ class FirebaseConnector:
         """Fetches the oldest 'queued' job."""
         jobs_ref = self.db.collection("jobs")
         # Order by creation time to process FIFO
-        query = jobs_ref.where("status", "==", "queued").order_by("createdAt").limit(1)
+        # Query for 'queued' AND 'test_connection'
+        # Note: 'in' queries support up to 10 values.
+        query = jobs_ref.where("status", "in", ["queued", "test_connection"]).order_by("createdAt").limit(1)
         results = list(query.stream())
         
         if results:
