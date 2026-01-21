@@ -1,7 +1,7 @@
 import os
 import json
 import openai
-import google.generativeai as genai
+from google import genai 
 
 class AIPipelines:
     def __init__(self, secrets_path="secrets.json", template_path="templates/Base.idf"):
@@ -15,16 +15,23 @@ class AIPipelines:
 
         # 2. Configure OpenAI
         if "OPENAI_API_KEY" in self.api_keys:
-            self.openai_client = openai.OpenAI(api_key=self.api_keys["OPENAI_API_KEY"])
+            try:
+                self.openai_client = openai.OpenAI(api_key=self.api_keys["OPENAI_API_KEY"])
+            except Exception as e:
+                print(f"[AI] Failed to init OpenAI: {e}")
+                self.openai_client = None
         else:
             self.openai_client = None
 
-        # 3. Configure Gemini
+        # 3. Configure Gemini (New SDK)
         if "GEMINI_API_KEY" in self.api_keys:
-            genai.configure(api_key=self.api_keys["GEMINI_API_KEY"])
-            self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+             try:
+                self.gemini_client = genai.Client(api_key=self.api_keys["GEMINI_API_KEY"])
+             except Exception as e:
+                print(f"[AI] Failed to init Gemini: {e}")
+                self.gemini_client = None
         else:
-            self.gemini_model = None
+            self.gemini_client = None
 
         # 4. Load Base Template
         self.base_idf = ""
@@ -78,10 +85,10 @@ class AIPipelines:
 
     def _call_openai(self, system, user):
         if not self.openai_client:
-            raise ValueError("OpenAI API Key missing in secrets.json")
+            raise ValueError("OpenAI API Key missing or client failed to init.")
             
         response = self.openai_client.chat.completions.create(
-            model="gpt-4o", # Or gpt-3.5-turbo
+            model="gpt-4o", 
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": user}
@@ -92,12 +99,15 @@ class AIPipelines:
         return self._sanitize_output(content)
 
     def _call_gemini(self, system, user):
-        if not self.gemini_model:
-            raise ValueError("Gemini API Key missing in secrets.json")
+        if not self.gemini_client:
+             raise ValueError("Gemini API Key missing or client failed to init.")
             
-        # Gemini often prefers combined prompts or chat history
+        # Gemini (New SDK) uses models.generate_content
         full_prompt = f"{system}\n\n{user}"
-        response = self.gemini_model.generate_content(full_prompt)
+        response = self.gemini_client.models.generate_content(
+            model='gemini-1.5-flash-latest', 
+            contents=full_prompt
+        )
         return self._sanitize_output(response.text)
 
     def _sanitize_output(self, text):
