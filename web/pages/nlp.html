@@ -27,12 +27,33 @@
 
   <br><br>
 
+  <br><br>
+
   <label for="aiModel">Select AI Model:</label>
   <select id="aiModel">
     <option value="gemini">Google Gemini (Free Tier)</option>
     <option value="openai">OpenAI (Requires Paid Key)</option>
   </select>
 
+  <br><br>
+
+  <!-- Layer 1 Retrofit: Simulation Controls -->
+  <h3>Simulation Settings</h3>
+  <label for="simType">Run Type:</label>
+  <select id="simType">
+    <option value="design_day">Design Day (Fast)</option>
+    <option value="annual">Annual (Slow)</option>
+  </select>
+  
+  &nbsp;&nbsp;
+  
+  <label for="weatherFile">Weather Location:</label>
+  <select id="weatherFile">
+    <option value="USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw">Chicago, USA</option>
+    <option value="GBR_London.Gatwick.037760_IWEC.epw">London, UK</option>
+    <option value="USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw">San Francisco, USA</option>
+  </select>
+  
   <br><br>
 
   <button onclick="submitDescription()">Queue Simulation Job</button>

@@ -51,7 +51,11 @@ function submitDescription() {
     // Placeholders for Layer 3 (Colab) to fill
     idfFilePath: null,
     weatherFilePath: null,
-    simulationConfig: JSON.parse(localStorage.getItem("smartHVAC_config") || "{}"),
+    simulationConfig: {
+      ...JSON.parse(localStorage.getItem("smartHVAC_config") || "{}"),
+      run_type: document.getElementById("simType") ? document.getElementById("simType").value : "design_day",
+      weather_file: document.getElementById("weatherFile") ? document.getElementById("weatherFile").value : "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
+    },
     resultPath: null,
     errorMessage: null
   };
