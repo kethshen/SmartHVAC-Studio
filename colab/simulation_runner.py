@@ -3,8 +3,6 @@ import shutil
 import pandas as pd
 import matplotlib.pyplot as plt
 from eplus.colab_bootstrap import prepare_colab_eplus
-from eplus.eplus_util import EPlusUtil
-from eplus.sql_explorer import EPlusSqlExplorer
 
 def run_simulation_job(job_id, idf_path, epw_path, config=None, output_dir_base="sim_runs"):
     """
@@ -24,8 +22,12 @@ def run_simulation_job(job_id, idf_path, epw_path, config=None, output_dir_base=
         config = {}
         
     # 1. Prepare Colab Environment (Safe to call repeatedly)
-    print(f"[{job_id}] Bootstrapping EnergyPlus...")
-    prepare_colab_eplus()
+    print(f"[{job_id}] Bootstrapping EnergyPlus (Verbose)...")
+    prepare_colab_eplus(silent=False)
+    
+    # Lazy import to avoid loading pyenergyplus before bootstrap
+    from eplus.eplus_util import EPlusUtil
+    from eplus.sql_explorer import EPlusSqlExplorer
     
     # 2. Setup Run Directory
     run_dir = os.path.join(output_dir_base, job_id)
