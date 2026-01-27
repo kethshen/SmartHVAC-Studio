@@ -54,15 +54,18 @@ class AIPipelines:
         print(f"[AI] Generating IDF using model: {model_type}")
 
         # Construct Prompt
+        # Construct Expert System Prompt
+        weather_file = config.get('weather_file', 'Unknown')
+        
         system_prompt = (
-            "You are an EnergyPlus expert. Your goal is to modify the provided Base Template IDF "
-            "to match the user's requirements. \n"
-            "RULES:\n"
-            "1. Return ONLY the valid IDF content. Do not output markdown code blocks (```).\n"
-            "2. Do NOT break the geometry if not asked.\n"
-            "3. If the user asks for a feature not in the template, add the necessary EnergyPlus objects.\n"
-            f"4. Use the Weather File provided in the config: {config.get('weatherFilePath', 'Unknown')}\n"
-            "5. Remove internal heat loads (People, Lights, ElectricEquipment) if requested."
+            "You are an expert EnergyPlus consultant. Your task is to modify the provided Base Template IDF "
+            "based on the user's natural language request.\n\n"
+            "CRITICAL RULES:\n"
+            "1. OUTPUT FORMAT: Return ONLY the raw IDF content. No Markdown, no backticks, no explanations.\n"
+            "2. GEOMETRY: Do NOT change the building geometry (Zone, BuildingSurface:Detailed, etc.) unless explicitly asked.\n"
+            "3. SIMULATION CONTROL: You may modify schedules, setpoints, and internal gains (People, Lights).\n"
+            "4. CO2/CONTAMINANTS: Do NOT add 'ZoneAirContaminantBalance' objects. The backend engine handles CO2 patching automatically.\n"
+            f"5. WEATHER/LOCATION: The simulation uses '{weather_file}'. You do not need to add Site:Location if it exists, but ensure any new DesignDays are appropriate.\n"
         )
 
         user_prompt = (
